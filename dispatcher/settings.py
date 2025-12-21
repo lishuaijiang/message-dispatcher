@@ -27,8 +27,8 @@ class Settings(BaseSettings):
     """
     log_level: str = "INFO"
     rabbitmq_url: str | None = None
-    exchange_name: str = "my_exchange"
-    queue_name: str = "my_queue"
+    exchange_name: str = "dispatcher_exchange"
+    queue_name: str = "dispatcher_queue"
     routing_key: str = "test.key"
 
     model_config = SettingsConfigDict(

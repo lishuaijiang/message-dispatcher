@@ -1,0 +1,36 @@
+name: message-dispatcher
+
+services:
+  broker:
+    image: ${BROKER_IMAGE:-rabbitmq:3.12-management-alpine}
+    expose:
+      # RabbitMQ 服务端口
+      - "5672"
+    ports:
+      # RabbitMQ 管理界面端口
+      - "${BROKER_MANAGEMENT_PORT:-15672}:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-admin123}
+    volumes:
+      - broker_data:/var/lib/rabbitmq
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - net
+
+networks:
+  net:
+
+volumes:
+  broker_data:
