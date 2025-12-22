@@ -48,8 +48,8 @@ def main(rabbitmq_url, exchange_name, exchange_type, queue_name, routing_key):
 if __name__ == '__main__':
     main(
         rabbitmq_url="amqp://user:password@host:rabbitmq_server_port",
-        exchange_name="my_exchange",
+        exchange_name="dispatcher_exchange",
         exchange_type="direct",
-        queue_name="my_queue",
+        queue_name="dispatcher_queue",
         routing_key="test.key"
     )

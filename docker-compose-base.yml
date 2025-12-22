@@ -2,7 +2,7 @@ name: message-dispatcher
 
 services:
   broker:
-    image: ${BROKER_IMAGE:-rabbitmq:3.12-management-alpine}
+    image: rabbitmq:3.12-management-alpine
     expose:
       # RabbitMQ 服务端口
       - "5672"
@@ -20,11 +20,15 @@ services:
       options:
         max-size: "50m"
         max-file: "3"
+
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      # rabbitmq readiness probe，等待 5672 端口真正可连
+      test: |
+        rabbitmq-diagnostics -q check_running &&
+        rabbitmq-diagnostics -q check_port_connectivity
+      interval: 3s
+      timeout: 3s
+      retries: 10
       start_period: 10s
     networks:
       - net

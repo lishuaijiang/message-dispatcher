@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -8,14 +9,16 @@ from dispatcher.utils import get_logger
 _logger = get_logger(name="dispatcher.settings", level=logging.DEBUG)
 
 # 项目根目录
-BASE_DIR = Path(__file__).parents[1]
-local_env = BASE_DIR / ".env"
+project_root = Path(__file__).parents[1]
+env_file = project_root / ".env"
+app_env = os.environ.get("APP_ENV", "development").lower()
 
-if local_env.exists():
-    env_file = local_env
-else:
-    env_file = None
-    _logger.warning("\033[33m ⚠️.env 文件不存在，将仅从系统环境变量中读取配置 \033[0m")
+if app_env == "development":
+    if env_file.exists():
+        _logger.info(f"✅ 已加载环境文件: {env_file.absolute()}")
+    else:
+        _logger.warning(
+            "\033[33m ⚠️.env 文件不存在，将仅从系统环境变量中读取配置 \033[0m")
 
 
 class Settings(BaseSettings):
@@ -31,10 +34,12 @@ class Settings(BaseSettings):
     queue_name: str = "dispatcher_queue"
     routing_key: str = "test.key"
 
+    # ref: https://docs.pydantic.dev/latest/concepts/pydantic_settings/
     model_config = SettingsConfigDict(
         # 暂时不考虑使用前缀区分 Compose 环境变量和 Code 环境变量，后续可选使用前缀区分
         env_prefix="",
-        env_file=env_file,
+        env_file=env_file if app_env == "development" else ".env",
+        env_file_encoding='utf-8',
         # 区分大小写
         case_sensitive=False,
     )

@@ -2,13 +2,13 @@ FROM python:3.10-slim-bookworm
 
 ARG POETRY_VERSION=2.2.1
 ARG PIP_MIRROR=https://mirrors.aliyun.com/pypi/simple/
-ARG DEPENDENCIES="
+ARG DEPENDENCIES="\
     curl \
     vim \
     less \
     iputils-ping \
     telnet \
-    rlwrap
+    rlwrap \
 "
 
 RUN set -ex \
@@ -48,8 +48,6 @@ COPY dispatcher ./dispatcher
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-WORKDIR /app/dispatcher
 
 EXPOSE 8000
 

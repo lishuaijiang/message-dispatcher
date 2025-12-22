@@ -19,24 +19,25 @@ async def rabbitmq_lifespan(app: FastAPI):
     if not settings.rabbitmq_url:
         raise RuntimeError("rabbitmq_url 未配置")
 
-    connection: AbstractRobustConnection = await connect_robust(
-        settings.rabbitmq_url)
-
-    # 初始化 broker 结构（声明交换机和队列）
-    async with connection.channel() as channel:
-        exchange = await channel.declare_exchange(
-            settings.exchange_name, ExchangeType.DIRECT, durable=True
-        )
-        queue = await channel.declare_queue(
-            settings.queue_name, durable=True
-        )
-
-        await queue.bind(exchange, routing_key=settings.routing_key)
-
-    app.state.rabbitmq_connection = connection
+    connection: AbstractRobustConnection | None = None
 
     try:
+        connection = await connect_robust(settings.rabbitmq_url)
+
+        # 初始化 broker 结构（声明交换机和队列）
+        async with connection.channel() as channel:
+            exchange = await channel.declare_exchange(
+                settings.exchange_name, ExchangeType.DIRECT, durable=True
+            )
+            queue = await channel.declare_queue(
+                settings.queue_name, durable=True
+            )
+
+            await queue.bind(exchange, routing_key=settings.routing_key)
+
+        app.state.rabbitmq_connection = connection
+
         yield
     finally:
-        if not connection.is_closed:
+        if connection and not connection.is_closed:
             await connection.close()

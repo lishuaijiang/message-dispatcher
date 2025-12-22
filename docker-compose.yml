@@ -6,9 +6,6 @@ services:
     image: nginx:stable-alpine
     ports:
       - "${NGINX_HTTP_PORT:-8080}:80"
-    depends_on:
-      api-server:
-        condition: service_healthy
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     restart: always
@@ -24,6 +21,9 @@ services:
     image: ${API_SERVER:-message-dispatcher-api-server:latest}
     expose:
       - "8000"
+    depends_on:
+      broker:
+        condition: service_healthy
     env_file:
       - .env
     environment:
@@ -31,18 +31,13 @@ services:
       PYTHONUNBUFFERED: 1
       # 容器里面不会生成 __pycache__ 和 .pyc 文件，避免无用文件
       PYTHONDONTWRITEBYTECODE: 1
+      APP_ENV: production
     restart: always
     logging:
       driver: json-file
       options:
         max-size: "50m"
         max-file: "3"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
     networks:
       - net
     command: launch dispatcher

@@ -28,7 +28,7 @@ async def get_rabbitmq_channel(request: Request) -> RobustChannel:
     """随用随取，避免在 lifespan 中挂载到 app 上，出现全局唯一 channel 问题"""
     connection = request.app.state.rabbitmq_connection
 
-    channel: RobustChannel = None
+    channel: RobustChannel | None = None
     try:
         channel = await connection.channel()
         yield channel
