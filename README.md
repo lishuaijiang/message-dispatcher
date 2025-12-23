@@ -14,14 +14,14 @@ Message Dispatcher 是一个基于 FastAPI 和 RabbitMQ 构建的轻量级消息
 
 ## 方式一：本地启动（开发说明）
 
-1. **克隆项目**
+**1. 克隆项目**
 
 ```bash
 git clone <repository-url>
 cd message-dispatcher
 ```
 
-2. **配置环境变量**
+**2. 配置环境变量**
 
 复制环境变量模板文件，**并根据您的需求调整配置**：
 
@@ -29,7 +29,7 @@ cd message-dispatcher
 cp .env.example .env
 ```
 
-3. **安装依赖项**
+**3. 安装依赖项**
 
 ```bash
 poetry install
@@ -46,7 +46,7 @@ poetry install
 > - `poetry add <package>`: 添加依赖（并锁定版本）
 > - `poetry remove <package>`: 移除依赖（自动清理子依赖）
 
-4. **启动 RabbitMQ 服务**
+**4. 启动 RabbitMQ 服务**
 
 如果你已经有可用的 RabbitMQ 服务，可跳过本步骤，否则，推荐使用 Docker 单独启动 RabbitMQ
 
@@ -75,24 +75,24 @@ docker compose -f docker-compose-base.yml up -d
 **⚠️注意：**
 RabbitMQ 启动完成后，请确认并修改 .env 文件中的 RABBITMQ_URL 配置，确保地址与端口正确
 
-5. **启动 API 服务**
+**5. 启动 API 服务**
 
 ```bash
 poetry run python -m dispatcher.main
 ```
 
-> 无需手动进入虚拟环境，直接使用`poetry run`即可
+> 无需手动进入虚拟环境，直接使用 `poetry run` 即可
 
 ## 方式二：容器启动（部署说明）
 
-1. **克隆项目**
+**1. 克隆项目**
 
 ```bash
 git clone <repository-url>
 cd message-dispatcher
 ```
 
-2. **配置环境变量**
+**2. 配置环境变量**
 
 复制环境变量模板文件，**并根据您的需求调整配置**：
 
@@ -100,19 +100,19 @@ cd message-dispatcher
 cp .env.example .env
 ```
 
-3. **构建 Docker 镜像**:
+**3. 构建 Docker 镜像**:
 
 ```bash
 docker build -t message-dispatcher-api-server:latest .
 ```
 
-4. **启动生产环境**:
+**4. 启动生产环境**:
 
 ```bash
 docker compose up -d
 ```
 
-5. **启动服务**
+**5. 启动服务**
 
 ```bash
 docker compose up -d
