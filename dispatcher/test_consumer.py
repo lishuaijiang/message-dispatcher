@@ -1,5 +1,6 @@
 """
 RabbitMQ 测试消费者，每次运行消费一条消息
+因为是测试脚本，这里先不做 redis 消息去重（避免重复消费）
 """
 import pika
 
@@ -9,6 +10,8 @@ def main(rabbitmq_url, exchange_name, exchange_type, queue_name, routing_key):
     params = pika.URLParameters(rabbitmq_url)
     connection = pika.BlockingConnection(params)
     channel = connection.channel()
+    # 一个 consumer 同时最多拿几条未 ACK 的消息
+    channel.basic_qos(prefetch_count=1)
 
     # 获取/声明交换机和队列
     channel.exchange_declare(
@@ -49,7 +52,7 @@ if __name__ == '__main__':
     main(
         rabbitmq_url="amqp://user:password@host:rabbitmq_server_port",
         exchange_name="dispatcher_exchange",
-        exchange_type="direct",
+        exchange_type="topic",
         queue_name="dispatcher_queue",
-        routing_key="test.key"
+        routing_key="test_routing_key"
     )

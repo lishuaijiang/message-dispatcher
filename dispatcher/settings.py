@@ -1,12 +1,8 @@
-import logging
 import os
 from pathlib import Path
 
+from aio_pika import ExchangeType
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-from dispatcher.utils import get_logger
-
-_logger = get_logger(name="dispatcher.settings", level=logging.DEBUG)
 
 # 项目根目录
 project_root = Path(__file__).parents[1]
@@ -15,10 +11,9 @@ app_env = os.environ.get("APP_ENV", "development").lower()
 
 if app_env == "development":
     if env_file.exists():
-        _logger.info(f"✅ 已加载环境文件: {env_file.absolute()}")
+        print(f"✅ 已加载环境文件: {env_file.absolute()}")
     else:
-        _logger.warning(
-            "\033[33m ⚠️.env 文件不存在，将仅从系统环境变量中读取配置 \033[0m")
+        print("\033[33m ⚠️.env 文件不存在，将仅从系统环境变量中读取配置 \033[0m")
 
 
 class Settings(BaseSettings):
@@ -30,9 +25,15 @@ class Settings(BaseSettings):
     """
     log_level: str = "INFO"
     rabbitmq_url: str | None = None
-    exchange_name: str = "dispatcher_exchange"
-    queue_name: str = "dispatcher_queue"
-    routing_key: str = "test.key"
+
+    # 默认配置（当请求中未指定时使用）
+    default_exchange_type: str = ExchangeType.TOPIC
+    default_exchange_name: str = "dispatcher_exchange"
+    default_queue_name: str = "dispatcher_queue"
+    default_routing_key: str = "test_routing_key"
+
+    # 是否自动创建 RabbitMQ 拓扑，默认为True
+    auto_declare_rabbitmq_topology: bool = True
 
     # ref: https://docs.pydantic.dev/latest/concepts/pydantic_settings/
     model_config = SettingsConfigDict(
@@ -43,12 +44,6 @@ class Settings(BaseSettings):
         # 区分大小写
         case_sensitive=False,
     )
-
-    @property
-    def resolved_log_level(self) -> int:
-        """将字符串日志等级统一转为 logging 模块的 int 值"""
-        level = self.log_level.upper()
-        return getattr(logging, level, logging.INFO)
 
 
 settings = Settings()

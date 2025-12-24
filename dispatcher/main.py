@@ -1,5 +1,8 @@
 from dispatcher.factory_app import create_app
+from dispatcher.logging_config import setup_logging
+from dispatcher.settings import settings
 
+setup_logging(level=settings.log_level)
 app = create_app()
 
 
