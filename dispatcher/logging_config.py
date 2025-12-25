@@ -18,7 +18,11 @@ def setup_logging(
     root_logger.setLevel(getattr(logging, level.upper(), logging.INFO))
 
     if format_str is None:
-        format_str = "%(asctime)s [%(levelname)s %(filename)s:%(lineno)d] %(message)s"
+        format_str = ("%(asctime)s [%(levelname)s "
+                      "pid=%(process)d "
+                      "pname=%(processName)s "
+                      "%(filename)s:%(lineno)d] "
+                      "%(message)s")
     if date_format is None:
         date_format = "%m-%d %H:%M:%S"
 

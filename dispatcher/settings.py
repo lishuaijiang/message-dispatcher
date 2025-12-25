@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     """
     log_level: str = "INFO"
     rabbitmq_url: str | None = None
+    connect_rabbitmq_retry_interval: int = 3
+    connect_rabbitmq_timeout: int = 3
+    connect_rabbitmq_max_retries: int = 5
 
     # 默认配置（当请求中未指定时使用）
     default_exchange_type: str = ExchangeType.TOPIC

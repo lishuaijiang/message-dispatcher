@@ -106,17 +106,13 @@ cp .env.example .env
 docker build -t message-dispatcher-api-server:latest .
 ```
 
-**4. 启动生产环境**:
+**4. 启动服务**
 
 ```bash
 docker compose up -d
 ```
 
-**5. 启动服务**
-
-```bash
-docker compose up -d
-```
+> `broker` 服务会启动的较慢一些，大约 20s，容器健康检查通过后会启动
 
 ## 服务访问
 
