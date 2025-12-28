@@ -44,9 +44,8 @@ async def rabbitmq_lifespan(app: FastAPI):
             except Exception as e:
                 logger.warning(f"连接 RabbitMQ 失败: {e}，等待 {interval} 秒后重试")
                 await asyncio.sleep(interval)
-        else:
-            logger.critical(f"已尝试 {max_retries} 次，RabbitMQ 未就绪，API 服务启动中止")
-            raise RuntimeError("RabbitMQ 连接失败，达到最大重试次数")
+
+        raise RuntimeError("RabbitMQ 连接失败，达到最大重试次数")
 
     try:
         connection = await connect_loop()
