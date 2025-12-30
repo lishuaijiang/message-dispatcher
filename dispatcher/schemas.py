@@ -1,9 +1,10 @@
 import uuid
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from dispatcher.settings import settings
+from dispatcher.utils import gen_sn
 
 
 class ExchangeTypeEnum(str, Enum):
@@ -42,6 +43,20 @@ class SubmitTaskIn(BaseModel):
         description="待发布的消息内容"
     )
 
+    # Pydantic V2 配置
     model_config = ConfigDict(
-        use_enum_values=True
+        use_enum_values=True,
+        validate_default=True
     )
+
+    @model_validator(mode='before')
+    def ensure_sn_in_payload(cls, values):
+        """
+        向 payload 中自动添加 sn 字段，用于唯一标识任务
+        保证消费者端幂等落库和 Redis 队列可靠
+        """
+        payload = values.get("payload") or {}
+        if "sn" not in payload:
+            payload["sn"] = gen_sn()
+        values["payload"] = payload
+        return values
