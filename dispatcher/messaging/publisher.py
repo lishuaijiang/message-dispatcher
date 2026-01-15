@@ -23,7 +23,7 @@ async def publish(
         **message_kwargs
 ) -> bool:
     """
-    动态发布消息到指定的交换机和队列
+    动态发布消息到指定的交换机和队列，支持消息级 priority 插队
 
     :param channel: 通道对象
     :param exchange_type: 交换机类型

@@ -38,6 +38,12 @@ class SubmitTaskIn(BaseModel):
         description="路由键，不提供则使用默认"
     )
 
+    priority: int = Field(
+        default=0,
+        ge=0,
+        le=9,
+        description="任务优先级（0~9，数值越大优先级越高）"
+    )
     payload: dict = Field(
         default={"test_message": "Hello RabbitMQ!"},
         description="待发布的消息内容"
@@ -49,7 +55,8 @@ class SubmitTaskIn(BaseModel):
         validate_default=True
     )
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
+    @classmethod
     def ensure_sn_in_payload(cls, values):
         """
         向 payload 中自动添加 sn 字段，用于唯一标识任务
@@ -59,4 +66,28 @@ class SubmitTaskIn(BaseModel):
         if "sn" not in payload:
             payload["sn"] = gen_sn()
         values["payload"] = payload
+        return values
+
+    @model_validator(mode="before")
+    @classmethod
+    def extract_priority(self, values):
+        """
+        提取任务优先级 priority 规则
+
+        - 用户显式传递 priority 时，直接使用该值（priority 需为整数，且取值范围为 0~9）
+        - 未传递 priority 时：
+          - payload.is_urgent 为 True → priority = 9
+          - 未传递 is_urgent 或为 False）→ priority = 0
+        """
+        MAX_PRIORITY = 9
+        DEFAULT_PRIORITY = 0
+
+        if "priority" in values and values.get("priority") is not None:
+            return values
+
+        payload = values.get("payload") or {}
+
+        # 语义化加急
+        is_urgent = bool(payload.get("is_urgent", False))
+        values["priority"] = MAX_PRIORITY if is_urgent else DEFAULT_PRIORITY
         return values

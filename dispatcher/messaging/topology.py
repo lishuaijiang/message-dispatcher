@@ -35,15 +35,21 @@ async def _ensure_queue(
         *,
         name: str,
         durable: bool = True,
-        auto_delete=False
+        auto_delete: bool = False,
+        max_priority: int | None = None,
 ) -> AbstractQueue:
     """
     确保 Queue 存在并返回 Queue 对象，（幂等）
     """
+    arguments = {}
+    if max_priority is not None:
+        arguments["x-max-priority"] = max_priority
+
     return await channel.declare_queue(
         name=name,
         durable=durable,
-        auto_delete=auto_delete
+        auto_delete=auto_delete,
+        arguments=arguments or None,
     )
 
 
@@ -65,7 +71,8 @@ async def ensure_topology(
         exchange_name: str,
         exchange_type: str,
         queue_name: str,
-        routing_key: str
+        routing_key: str,
+        max_priority: int = 10,
 ) -> AbstractExchange:
     """
     RabbitMQ 拓扑管理，确保 Exchange、Queue、Binging 存在
@@ -84,7 +91,8 @@ async def ensure_topology(
     )
     queue = await _ensure_queue(
         channel,
-        name=queue_name
+        name=queue_name,
+        max_priority=max_priority,
     )
     await _ensure_binding(
         exchange=exchange,

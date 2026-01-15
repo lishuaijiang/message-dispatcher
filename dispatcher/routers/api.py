@@ -36,6 +36,7 @@ async def submit_task(
         channel=channel,
         body=body,
         message_id=message_id,
+        priority=task_dict["priority"],
         **queue_config
     )
     return {"task_id": task.uuid, "status": "submitted"}
