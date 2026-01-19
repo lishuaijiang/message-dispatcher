@@ -3,12 +3,14 @@ name: message-dispatcher
 services:
   broker:
     image: rabbitmq:4.2.2-management-alpine
-    expose:
-      # RabbitMQ 服务端口
-      - "5672"
+    # expose:
+    #   # RabbitMQ 服务端口
+    #   - "5672"
     ports:
       # RabbitMQ 管理界面端口
       - "${BROKER_MANAGEMENT_PORT:-15672}:15672"
+      # RabbitMQ Server 端口
+      - "${BROKER_SERVER_PORT:-5672}:5672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-admin}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-admin123}
