@@ -14,25 +14,16 @@ ARG DEPENDENCIES="\
 RUN set -ex \
     && { \
         echo "Types: deb"; \
-        echo "URIs: https://mirrors.tuna.tsinghua.edu.cn/debian"; \
+        echo "URIs: http://deb.debian.org/debian"; \
         echo "Suites: bookworm bookworm-updates bookworm-backports"; \
         echo "Components: main contrib non-free non-free-firmware"; \
-        echo "Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg"; \
         echo ""; \
         echo "Types: deb"; \
-        echo "URIs: https://mirrors.tuna.tsinghua.edu.cn/debian-security"; \
+        echo "URIs: http://security.debian.org/debian-security"; \
         echo "Suites: bookworm-security"; \
         echo "Components: main contrib non-free non-free-firmware"; \
-        echo "Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg"; \
     } > /etc/apt/sources.list.d/debian.sources \
-    && rm -f /etc/apt/sources.list \
-    && apt-get -o Acquire::Check-Valid-Until=false update \
-    && apt-get install -y --no-install-recommends debian-archive-keyring \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends ${DEPENDENCIES} \
-    && echo "no" | dpkg-reconfigure dash \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -f /etc/apt/sources.list
 
 WORKDIR /app
 
